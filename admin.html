@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel - Mehras Sports</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--red:#dc2626;--red-d:#b91c1c;--red-l:#fef2f2;--dark:#111827;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;--green:#10b981;--blue:#3b82f6;--amber:#f59e0b;--purple:#8b5cf6}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--gray-50);color:var(--gray-900);line-height:1.5;-webkit-font-smoothing:antialiased}
+.login-bg{min-height:100vh;background:linear-gradient(135deg,#111827 0%,#1f2937 40%,#7f1d1d 100%);display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{width:100%;max-width:380px;text-align:center}
+.login-logo{width:64px;height:64px;background:var(--red);border-radius:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:24px;margin:0 auto 16px;box-shadow:0 8px 24px rgba(220,38,38,.3)}
+.login-title{font-size:24px;font-weight:900;color:#fff;letter-spacing:1px}
+.login-sub{color:#9ca3af;font-size:14px;margin-top:4px}
+.login-card{background:#fff;border-radius:16px;padding:24px;margin-top:32px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-card label{display:block;font-size:11px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;text-align:left}
+.pw-wrap{position:relative}
+.pw-wrap input{width:100%;padding:12px 44px 12px 16px;border:1px solid var(--gray-200);border-radius:12px;font-size:14px;outline:none;transition:border .2s}
+.pw-wrap input:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,.08)}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--gray-400)}
+.pw-toggle:hover{color:var(--gray-600)}
+.pw-err{color:var(--red);font-size:12px;margin-top:6px;font-weight:500;text-align:left}
+.login-btn{width:100%;padding:12px;background:var(--red);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;margin-top:16px;transition:background .2s}
+.login-btn:hover{background:var(--red-d)}
+.login-footer{text-align:center;font-size:11px;color:var(--gray-400);margin-top:12px}
+
+/* Layout */
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:220px;background:#fff;border-right:1px solid var(--gray-100);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:50;transform:translateX(-100%);transition:transform .3s}
+.sidebar.open{transform:translateX(0)}
+.sidebar-head{padding:14px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:10px}
+.sidebar-icon{width:32px;height:32px;background:var(--red);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:14px}
+.sidebar-brand{font-size:11px;font-weight:900;color:var(--gray-900);letter-spacing:.5px}
+.sidebar-sub{font-size:10px;color:var(--gray-400);font-weight:500}
+.sidebar-nav{flex:1;padding:8px;overflow-y:auto}
+.nav-btn{width:100%;display:flex;align-items:center;gap:8px;padding:8px 12px;border:none;border-radius:12px;background:none;font-size:13px;font-weight:500;color:var(--gray-500);cursor:pointer;text-align:left;transition:all .15s}
+.nav-btn:hover{background:var(--gray-50);color:var(--gray-800)}
+.nav-btn.active{background:var(--red-l);color:var(--red);font-weight:700}
+.nav-btn .emoji{font-size:15px;width:20px;text-align:center}
+.nav-badge{margin-left:auto;font-size:10px;padding:2px 6px;border-radius:99px;font-weight:700;background:var(--gray-100);color:var(--gray-500)}
+.nav-btn.active .nav-badge{background:#fecaca;color:#991b1b}
+.sidebar-foot{padding:10px;border-top:1px solid var(--gray-100);display:flex;flex-direction:column;gap:6px}
+.sidebar-foot a,.sidebar-foot button{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:12px;font-size:12px;font-weight:700;text-decoration:none;cursor:pointer;border:none}
+.visit-btn{background:var(--dark);color:#fff}
+.visit-btn:hover{background:#000}
+.logout-btn{background:none;border:1px solid #fecaca!important;color:var(--red)}
+.logout-btn:hover{background:var(--red-l)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:40}
+.overlay.show{display:block}
+
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;margin-left:0}
+.topbar{background:#fff;border-bottom:1px solid var(--gray-100);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.menu-btn{background:none;border:none;font-size:20px;cursor:pointer;color:var(--gray-600);padding:2px}
+.topbar h1{font-size:16px;font-weight:700}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.notif-wrap{position:relative}
+.notif-wrap button{background:none;border:none;cursor:pointer;font-size:16px;padding:4px}
+.notif-dot{position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:var(--red);color:#fff;font-size:9px;font-weight:700;border-radius:99px;display:flex;align-items:center;justify-content:center}
+.avatar{width:28px;height:28px;background:var(--red);border-radius:99px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700}
+.content{flex:1;overflow-y:auto;padding:16px}
+
+/* Cards & Tables */
+.card{background:#fff;border-radius:16px;border:1px solid var(--gray-100);box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden;margin-bottom:16px}
+.card-head{padding:12px 16px;border-bottom:1px solid var(--gray-50);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:space-between}
+.card-body{padding:16px}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
+.stat{background:#fff;border-radius:16px;padding:16px;border:1px solid var(--gray-100);box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.stat-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.stat-label{font-size:11px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px}
+.stat-val{font-size:24px;font-weight:900;color:var(--gray-900)}
+.stat-sub{font-size:11px;color:var(--gray-400)}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;background:var(--gray-50);border-bottom:1px solid var(--gray-100)}
+td{padding:8px 12px;border-bottom:1px solid var(--gray-50);font-size:13px;vertical-align:middle}
+tr:hover td{background:rgba(249,250,251,.5)}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700}
+.badge-green{background:#d1fae5;color:#065f46}.badge-red{background:#fee2e2;color:#991b1b}.badge-blue{background:#dbeafe;color:#1e40af}
+.badge-amber{background:#fef3c7;color:#92400e}.badge-purple{background:#ede9fe;color:#5b21b6}.badge-gray{background:var(--gray-100);color:var(--gray-600)}
+.prod-badge{font-size:10px;font-weight:700;color:var(--red);background:var(--red-l);padding:1px 6px;border-radius:4px}
+.stock-ok{color:var(--gray-700);font-weight:700}.stock-low{color:var(--amber);font-weight:700}.stock-out{color:var(--red);font-weight:700}
+.action-btn{background:none;border:none;cursor:pointer;padding:4px;border-radius:8px;font-size:13px}
+.action-btn:hover{background:var(--gray-100)}
+.price-orig{font-size:11px;color:var(--gray-400);text-decoration:line-through;margin-left:4px}
+.row-item{display:flex;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--gray-50)}
+.row-item:last-child{border:none}
+.status-sel{font-size:11px;border:1px solid var(--gray-200);border-radius:6px;padding:2px 4px;background:#fff}
+
+/* Forms */
+.form-group{margin-bottom:12px}
+.form-label{display:block;font-size:11px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.form-input,.form-select,.form-textarea{width:100%;padding:8px 12px;border:1px solid var(--gray-200);border-radius:12px;font-size:13px;font-family:inherit;outline:none;transition:border .2s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,.06)}
+.form-textarea{resize:none}
+.form-row{display:grid;gap:12px}
+.form-row-2{grid-template-columns:1fr 1fr}.form-row-3{grid-template-columns:1fr 1fr 1fr}
+.check-label{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:500}
+.check-label input{width:16px;height:16px;accent-color:var(--red)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover{background:var(--red-d)}
+.btn-dark{background:var(--dark);color:#fff}.btn-dark:hover{background:#000}
+.btn-outline{background:none;border:1px solid var(--gray-200);color:var(--gray-700)}.btn-outline:hover{background:var(--gray-50)}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#059669}
+.btn-full{width:100%}
+.btn-sm{padding:6px 12px;font-size:12px}
+.flex-gap{display:flex;gap:8px}
+.flex-between{display:flex;justify-content:space-between;align-items:center}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.text-center{text-align:center}
+.mt-2{margin-top:8px}.mt-3{margin-top:12px}.mb-2{margin-bottom:8px}.mb-3{margin-bottom:12px}
+
+/* Filters */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.filter-btn{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;border:1px solid var(--gray-200);background:#fff;color:var(--gray-600);cursor:pointer}
+.filter-btn:hover{background:var(--gray-50)}
+.filter-btn.active{background:var(--red);color:#fff;border-color:var(--red)}
+.search-input{flex:1;max-width:240px;padding:8px 12px;border:1px solid var(--gray-200);border-radius:12px;font-size:13px;outline:none}
+.search-input:focus{border-color:var(--red)}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:60;justify-content:center;align-items:flex-start;padding:16px;padding-top:3vh;overflow-y:auto}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:560px;box-shadow:0 20px 60px rgba(0,0,0,.2);margin:16px 0}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--gray-100);position:sticky;top:0;background:#fff;border-radius:16px 16px 0 0;z-index:1}
+.modal-head h3{font-weight:700}
+.modal-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--gray-400);padding:4px;border-radius:8px}
+.modal-close:hover{background:var(--gray-100);color:var(--gray-700)}
+.modal-body{padding:20px;max-height:75vh;overflow-y:auto}
+
+/* Messages */
+.msg-grid{display:grid;grid-template-columns:1fr 2fr;gap:12px;min-height:55vh}
+.msg-list{background:#fff;border-radius:16px;border:1px solid var(--gray-100);overflow:hidden;display:flex;flex-direction:column}
+.msg-item{padding:12px;border-bottom:1px solid var(--gray-50);cursor:pointer;text-align:left;background:none;border-left:2px solid transparent;width:100%;font-family:inherit}
+.msg-item:hover{background:var(--gray-50)}
+.msg-item.active{background:var(--red-l);border-left-color:var(--red)}
+.msg-item.unread{background:rgba(219,234,254,.4)}
+.msg-detail{background:#fff;border-radius:16px;border:1px solid var(--gray-100);display:flex;flex-direction:column;overflow:hidden}
+
+/* Social */
+.social-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.social-row .emoji{font-size:20px;width:32px;text-align:center}
+.social-row .form-input{flex:1}
+
+/* Deploy */
+.deploy-hero{background:linear-gradient(135deg,var(--red),var(--red-d));border-radius:16px;padding:20px;color:#fff;margin-bottom:16px}
+.deploy-hero h2{font-size:20px;font-weight:900}
+.deploy-hero p{color:#fecaca;font-size:13px;margin-top:4px}
+.step-card{margin-bottom:12px}
+.step-head{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--gray-50);border-bottom:1px solid var(--gray-100)}
+.step-num{width:32px;height:32px;background:var(--red);border-radius:99px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:13px;flex-shrink:0}
+.step-head h3{font-weight:700;font-size:13px}
+.step-body{padding:16px}
+.step-body p{font-size:13px;color:var(--gray-700);margin-bottom:6px;display:flex;align-items:start;gap:8px}
+.step-body p::before{content:"•";color:var(--gray-400);flex-shrink:0;margin-top:1px}
+.cmd-line{background:var(--gray-900);color:#4ade80;padding:8px 16px;border-radius:8px;font-family:'Menlo','Courier New',monospace;font-size:12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.cmd-line button{background:none;border:none;color:var(--gray-500);cursor:pointer;font-size:12px}
+.cmd-line button:hover{color:#fff}
+.tip-box{background:#fffbeb;border:1px solid #fde68a;border-radius:16px;padding:16px;margin-bottom:16px}
+.tip-box h3{font-weight:700;font-size:14px;margin-bottom:8px}
+.tip-box p{font-size:13px;color:#92400e;margin-bottom:4px}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--dark);color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:70;box-shadow:0 8px 24px rgba(0,0,0,.2);animation:slideUp .3s}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* Responsive */
+@media(min-width:1024px){
+  .sidebar{transform:translateX(0)}.main{margin-left:220px}.menu-btn{display:none}
+  .stat-grid{grid-template-columns:repeat(4,1fr)}.overlay{display:none!important}
+}
+@media(max-width:1023px){
+  .msg-grid{grid-template-columns:1fr}.msg-detail{display:none}.msg-detail.show{display:flex}
+  .form-row-3{grid-template-columns:1fr 1fr}
+  .grid-4{grid-template-columns:1fr 1fr}
+}
+@media(max-width:640px){
+  .form-row-2,.form-row-3{grid-template-columns:1fr}
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .filter-bar{flex-direction:column}.search-input{max-width:100%}
+}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  MEHRAS SPORTS — ADMIN PANEL v2.0
+//  Standalone HTML — works on any device/browser
+// ══════════════════════════════════════════════
+
+const ADMIN_PASSWORD = "Mehras@2026!";
+
+const CATS = [
+  {id:"boxing-gloves",n:"Boxing Gloves"},{id:"punching-bags",n:"Punching Bags"},{id:"head-guards",n:"Head Guards"},
+  {id:"focus-mitts",n:"Focus Mitts & Pads"},{id:"boxing-accessories",n:"Boxing Accessories"},
+  {id:"mma-gloves",n:"MMA Gloves"},{id:"mma-shorts",n:"MMA Shorts"},{id:"rash-guards",n:"Rash Guards"},
+  {id:"shin-guards",n:"Shin Guards"},{id:"taekwondo",n:"Taekwondo"},{id:"karate",n:"Karate"},
+  {id:"judo-bjj",n:"Judo & BJJ"},{id:"sparring-gear",n:"Sparring Gear"},{id:"belts",n:"Belts"},
+  {id:"tracksuits",n:"Tracksuits"},{id:"hoodies",n:"Hoodies"},{id:"tshirts",n:"T-Shirts"},
+  {id:"joggers",n:"Joggers & Shorts"},{id:"sports-bras",n:"Sports Bras"},
+];
+const cn = id => CATS.find(c=>c.id===id)?.n||id;
+
+// State
+let state = {
+  loggedIn: false,
+  page: "dash",
+  sidebar: false,
+  toast: "",
+  products: [
+    {id:1,name:"Leather Boxing Gloves",sku:"MSE-BG001",cat:"boxing-gloves",price:39.99,orig:59.99,stock:150,status:"active",badge:"Best Seller",img:"leather-boxing-gloves-1.jpg",desc:"Genuine cowhide leather with velcro wrist straps.",sizes:"8oz,10oz,12oz,14oz,16oz",colors:"Red,Black,Blue,White",feats:"Genuine Cowhide Leather\nVelcro Wrist Straps\nMulti-layer Foam",specs:"Material:Genuine Cowhide Leather|Closure:Velcro|Padding:Multi-layer Foam"},
+    {id:2,name:"Professional Boxing Gloves",sku:"MSE-BG002",cat:"boxing-gloves",price:49.99,orig:69.99,stock:85,status:"active",badge:"",img:"leather-boxing-gloves-2.jpg",desc:"Professional grade with superior padding.",sizes:"10oz,12oz,14oz,16oz",colors:"Red,Black",feats:"Premium Leather\nHigh-density Foam",specs:"Material:Premium Leather|Padding:High-density Foam"},
+    {id:3,name:"Training Boxing Gloves",sku:"MSE-BG003",cat:"boxing-gloves",price:29.99,orig:44.99,stock:200,status:"active",badge:"Popular",img:"leather-boxing-gloves-3.jpg",desc:"Durable training gloves.",sizes:"10oz,12oz,14oz,16oz",colors:"Red,Black,Blue",feats:"Durable Construction\nHeavy Bag Training",specs:"Material:Leather/Synthetic|Use:Heavy Bag"},
+    {id:4,name:"Competition Gloves",sku:"MSE-BG005",cat:"boxing-gloves",price:59.99,orig:79.99,stock:45,status:"active",badge:"Pro",img:"leather-boxing-gloves-5.jpg",desc:"Tournament approved.",sizes:"8oz,10oz,12oz",colors:"Red,Blue",feats:"Tournament Grade\nPremium Cowhide",specs:"Material:Premium Cowhide|Approved:Tournament"},
+    {id:5,name:"Punching Bag – Genuine Leather",sku:"MSE-2376",cat:"punching-bags",price:149.99,orig:219.99,stock:25,status:"active",badge:"Premium",img:"2376_Genuine_Leather.jpg",desc:"Professional genuine leather heavy bag.",sizes:"3ft,4ft,5ft,6ft",colors:"Black,Brown,Red",feats:"Genuine Leather\nChain Mount",specs:"Material:Genuine Leather|Mount:Chain System|Weight:70-150 lbs"},
+    {id:6,name:"Punching Bag – Cowhide",sku:"MSE-2382",cat:"punching-bags",price:139.99,orig:199.99,stock:18,status:"active",badge:"Best Seller",img:"2382_Cowhide_Leather.jpg",desc:"Premium cowhide leather.",sizes:"4ft,5ft,6ft",colors:"Black,Brown",feats:"Cowhide Leather\nHeavy Duty",specs:"Material:Cowhide|Mount:Chain System"},
+    {id:7,name:"Leather Head Guard",sku:"MSE-HG001",cat:"head-guards",price:54.99,orig:74.99,stock:70,status:"active",badge:"Popular",img:"leather-boxing-head-gear-1.jpg",desc:"Full face protection.",sizes:"S,M,L,XL",colors:"Red,Black,Blue,White",feats:"Full Face Protection\nGenuine Leather",specs:"Material:Genuine Leather|Protection:Full Face"},
+    {id:8,name:"Focus Mitts",sku:"MSE-FM001",cat:"focus-mitts",price:34.99,orig:49.99,stock:90,status:"active",badge:"Popular",img:"focus-mitt.jpg",desc:"Curved leather focus mitts.",sizes:"",colors:"Red,Black",feats:"Curved Design\nLeather",specs:"Material:Leather|Design:Curved"},
+    {id:9,name:"Thai Pads",sku:"MSE-FM002",cat:"focus-mitts",price:49.99,orig:69.99,stock:45,status:"active",badge:"Heavy Duty",img:"thai-pads-kicking-pads-1.jpg",desc:"Heavy duty Thai pads.",sizes:"",colors:"Red,Black",feats:"Heavy Duty\nLeather",specs:"Material:Leather|Padding:High-density"},
+    {id:10,name:"Hand Wraps",sku:"MSE-BA001",cat:"boxing-accessories",price:7.99,orig:12.99,stock:500,status:"active",badge:"",img:"hand-wraps.jpg",desc:"Cotton/elastic 180 inch.",sizes:"",colors:"Red,Black,Blue,White,Pink",feats:"Cotton/Elastic\n180 inches",specs:"Material:Cotton/Elastic|Length:180 inches"},
+    {id:11,name:"MMA Competition Gloves",sku:"MSE-MG001",cat:"mma-gloves",price:34.99,orig:49.99,stock:80,status:"active",badge:"Popular",img:"mma-gloves-1.jpg",desc:"4oz open palm MMA gloves.",sizes:"S,M,L,XL",colors:"Red,Black,Blue",feats:"4oz Weight\nOpen Palm",specs:"Material:Leather|Weight:4oz|Palm:Open"},
+    {id:12,name:"MMA Shorts",sku:"MSE-MS001",cat:"mma-shorts",price:29.99,orig:44.99,stock:100,status:"active",badge:"Popular",img:"mma-shorts-1.jpg",desc:"Sublimation printed.",sizes:"S,M,L,XL,XXL",colors:"",feats:"Sublimation Print\n4-way Stretch",specs:"Material:Polyester/Spandex"},
+    {id:13,name:"Rash Guard",sku:"MSE-RG001",cat:"rash-guards",price:34.99,orig:49.99,stock:75,status:"active",badge:"",img:"rash-guards-1.jpg",desc:"Compression fit.",sizes:"S,M,L,XL,XXL",colors:"",feats:"Compression Fit\nSublimation Print",specs:"Material:Polyester/Spandex"},
+    {id:14,name:"Taekwondo Uniform",sku:"MSE-0001",cat:"taekwondo",price:34.99,orig:49.99,stock:150,status:"active",badge:"Classic",img:"Taekwondo_Uniform_MSE-0001_MSE-0002.jpg",desc:"Traditional white V-neck.",sizes:"000,00,0,1,2,3,4,5,6,7",colors:"White",feats:"V-Neck Traditional\nCotton/Polyester",specs:"Material:Cotton/Polyester|Style:V-Neck"},
+    {id:15,name:"Poomsae Uniform",sku:"MSE-0022",cat:"taekwondo",price:54.99,orig:79.99,stock:60,status:"active",badge:"Competition",img:"Poomsae_Uniform_White_Red_Blue_MSE-0022_MSE-0023.jpg",desc:"WTF approved.",sizes:"1,2,3,4,5,6,7",colors:"White/Red,White/Blue",feats:"WTF Approved\nPremium Polyester",specs:"Material:Premium Polyester|Approved:WTF/WT"},
+    {id:16,name:"Heavyweight Karate Gi",sku:"MSE-0047",cat:"karate",price:44.99,orig:64.99,stock:90,status:"active",badge:"Best Seller",img:"Heavy_Weight_Karate_Uniform_MSE-0047_MSE-0048.jpg",desc:"14oz heavy cotton.",sizes:"0,1,2,3,4,5,6,7",colors:"White,Black",feats:"Heavy Cotton 14oz\nCompetition Grade",specs:"Material:Heavy Cotton|Weight:14oz"},
+    {id:17,name:"Judo Uniform",sku:"MSE-0049",cat:"judo-bjj",price:49.99,orig:69.99,stock:55,status:"active",badge:"Popular",img:"Judo_Uniform_White_Blue_MSE-0049_MSE-0050.jpg",desc:"Heavy weave cotton.",sizes:"0,1,2,3,4,5,6,7",colors:"White,Blue",feats:"Heavy Weave Cotton",specs:"Material:Heavy Weave Cotton"},
+    {id:18,name:"BJJ Gi",sku:"MSE-0053",cat:"judo-bjj",price:54.99,orig:79.99,stock:40,status:"active",badge:"BJJ",img:"Jiu-Jitsu_Uniform_White_Blue_MSE-0053_MSE-0054.jpg",desc:"Pearl weave + ripstop.",sizes:"A0,A1,A2,A3,A4",colors:"White,Blue,Black",feats:"Pearl Weave\nRipstop Pants",specs:"Material:Pearl Weave / Ripstop"},
+    {id:19,name:"Platinum Belts",sku:"MSE-0057",cat:"belts",price:9.99,orig:14.99,stock:400,status:"active",badge:"All Colors",img:"Belts_Platinum_Solid_Color_Striped_MSE-0057_to_MSE-0061.jpg",desc:"Full range martial arts belts.",sizes:"",colors:"White,Yellow,Orange,Green,Blue,Purple,Brown,Red,Black",feats:"Solid & Striped\nAll Colors",specs:"Material:Cotton/Satin"},
+    {id:20,name:"Men's Tracksuits",sku:"MSE-TS001",cat:"tracksuits",price:49.99,orig:69.99,stock:120,status:"active",badge:"Popular",img:"tracksuits-male.jpg",desc:"Premium zipper tracksuits.",sizes:"S,M,L,XL,XXL",colors:"Black,Navy,Gray,Red",feats:"Cotton/Poly/Spandex\nZipper\nCustom Branding",specs:"Material:Cotton/Polyester/Spandex|Closure:Zipper"},
+    {id:21,name:"Men's Hoodies",sku:"MSE-HD001",cat:"hoodies",price:39.99,orig:54.99,stock:100,status:"active",badge:"Popular",img:"hoodies.jpg",desc:"Fleece hoodies.",sizes:"S,M,L,XL,XXL",colors:"Black,Gray,Navy,Red",feats:"Fleece Lining\nKangaroo Pocket",specs:"Material:Fleece / Cotton-Polyester"},
+    {id:22,name:"Sports T-Shirts",sku:"MSE-TT001",cat:"tshirts",price:19.99,orig:29.99,stock:250,status:"active",badge:"Popular",img:"t-shirts-1.jpg",desc:"Moisture-wicking tees.",sizes:"S,M,L,XL,XXL",colors:"",feats:"Moisture-Wicking\nBreathable",specs:"Material:Polyester/Cotton"},
+    {id:23,name:"Jogger Pants",sku:"MSE-JP001",cat:"joggers",price:34.99,orig:49.99,stock:130,status:"active",badge:"",img:"jogger-pants-1.jpg",desc:"Cotton/fleece joggers.",sizes:"S,M,L,XL,XXL",colors:"Black,Gray,Navy",feats:"Cotton/Fleece\nElastic Waist",specs:"Material:Cotton/Fleece"},
+    {id:24,name:"Sports Bra Collection",sku:"MSE-SB001",cat:"sports-bras",price:24.99,orig:34.99,stock:80,status:"active",badge:"Women's",img:"sports-bra-1.jpg",desc:"High support sports bras.",sizes:"XS,S,M,L,XL",colors:"Black,White,Pink,Red",feats:"Nylon/Spandex\nHigh Support",specs:"Material:Nylon/Spandex|Support:High"},
+  ],
+  orders: [
+    {id:"ORD-1001",cust:"James Wilson",email:"james@email.com",ph:"+1-555-0123",country:"USA",addr:"123 Main St, NY",items:[{n:"Leather Boxing Gloves",q:2,p:39.99},{n:"Hand Wraps",q:3,p:7.99}],total:103.95,status:"pending",pay:"PayPal",date:"2026-02-27"},
+    {id:"ORD-1002",cust:"Ahmed Hassan",email:"ahmed@email.com",ph:"+971-50-123456",country:"UAE",addr:"Dubai Marina",items:[{n:"Punching Bag – Genuine Leather",q:1,p:149.99}],total:149.99,status:"confirmed",pay:"Wise",date:"2026-02-26"},
+    {id:"ORD-1003",cust:"Sarah Chen",email:"sarah@email.com",ph:"+1-604-555-0789",country:"Canada",addr:"Vancouver",items:[{n:"Taekwondo Uniform",q:5,p:34.99}],total:174.95,status:"shipped",pay:"PayPal",date:"2026-02-25"},
+    {id:"ORD-1004",cust:"Fatima Al-Rashid",email:"fatima@email.com",ph:"+966-50-123456",country:"KSA",addr:"Riyadh",items:[{n:"Karate Gi",q:20,p:44.99}],total:899.80,status:"pending",pay:"Wise",date:"2026-02-27"},
+    {id:"ORD-1005",cust:"Michael Brown",email:"mike@email.com",ph:"+44-20-1234-5678",country:"UK",addr:"London",items:[{n:"Men's Tracksuits",q:10,p:49.99}],total:499.90,status:"delivered",pay:"WhatsApp",date:"2026-02-22"},
+  ],
+  msgs: [
+    {id:1,name:"Robert Taylor",email:"robert@sportsgym.com",subj:"Bulk Order - 500 Boxing Gloves",msg:"Hi, I need 500 pairs of custom-branded gloves.",date:"2026-02-27",read:false,type:"wholesale"},
+    {id:2,name:"Lisa Wong",email:"lisa@hksports.hk",subj:"Wholesale Partnership",msg:"We are a Hong Kong distributor looking for MMA equipment.",date:"2026-02-26",read:false,type:"wholesale"},
+    {id:3,name:"Carlos Rivera",email:"carlos@tkdacademy.com",subj:"Custom TKD Uniforms x200",msg:"Our academy needs 200 uniforms with custom embroidery.",date:"2026-02-25",read:true,type:"inquiry"},
+    {id:4,name:"Emily Johnson",email:"emily@email.com",subj:"Shipping to Australia?",msg:"What are your rates to Sydney?",date:"2026-02-24",read:true,type:"support"},
+  ],
+  site: {
+    name:"Mehras Sports Enterprises",tagline:"Sports & Leather Goods Manufacturer",
+    email:"info@mehrassportsent.com",phone:"+92 341 7007400",whatsapp:"+923417007400",
+    address:"Dogra Khurd, P.O. Harrar, Sialkot, Pakistan",domain:"mehrassports.com",
+    github:"https://github.com/naimtahirbaig/mehrassports",freeShip:500,currency:"USD",
+    announce:"FREE SHIPPING ON ORDERS $500+",showAnnounce:true,copyright:"2026 Mehras Sports Enterprises",
+    social:{facebook:"",instagram:"",whatsapp:"https://wa.me/923417007400",youtube:"",tiktok:"",twitter:"",linkedin:"",pinterest:""},
+    pay:{paypalEmail:"junaid.uol.edu.pk@gmail.com",paypalMe:"https://paypal.com/paypalme/junaiduol",wiseUser:"@naimb50",wiseLink:"https://wise.com/pay/me/naimb50",bankName:"",bankAcct:"",bankIBAN:""},
+    seo:{title:"Mehras Sports – Boxing, MMA & Martial Arts Equipment",desc:"Premium boxing gloves, MMA gear, martial arts uniforms from Sialkot, Pakistan.",keywords:"boxing gloves, MMA, taekwondo, martial arts, sportswear"},
+    slides:[{title:"PREMIUM BOXING EQUIPMENT",sub:"Factory Direct • Custom Branding",cta:"Shop Boxing",link:"boxing-gloves.html"},{title:"MARTIAL ARTS UNIFORMS",sub:"Taekwondo, Karate, Judo, BJJ",cta:"Shop Now",link:"martial-arts.html"},{title:"CUSTOM SPORTSWEAR",sub:"Your Brand, Our Quality",cta:"Shop Sportswear",link:"sportswear.html"}],
+  },
+  selMsg: null,
+  editProd: null,
+  modalOpen: false,
+  orderDetail: null,
+  orderModalOpen: false,
+};
+
+// Save/load from localStorage
+function saveState() { try { localStorage.setItem('mehras_admin', JSON.stringify({products:state.products,orders:state.orders,msgs:state.msgs,site:state.site})); } catch(e){} }
+function loadState() { try { const d = JSON.parse(localStorage.getItem('mehras_admin')); if(d){ state.products=d.products||state.products; state.orders=d.orders||state.orders; state.msgs=d.msgs||state.msgs; state.site=d.site||state.site; } } catch(e){} }
+loadState();
+
+function flash(m) { state.toast=m; render(); setTimeout(()=>{state.toast="";render();},2500); }
+function setPage(p) { state.page=p; state.sidebar=false; render(); }
+
+const statusBadge = s => {const m={active:"green",inactive:"gray",pending:"amber",confirmed:"blue",shipped:"purple",delivered:"green",cancelled:"red"};return `<span class="badge badge-${m[s]||'gray'}">${s?s.charAt(0).toUpperCase()+s.slice(1):''}</span>`;};
+const payBadge = p => `<span class="badge badge-${p==='PayPal'?'blue':'green'}">${p}</span>`;
+const typeBadge = t => `<span class="badge badge-${t==='wholesale'?'purple':t==='inquiry'?'blue':'gray'}">${t}</span>`;
+const stockClass = s => s===0?'stock-out':s<20?'stock-low':'stock-ok';
+
+// ══════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════
+function render() {
+  const app = document.getElementById('app');
+  if (!state.loggedIn) { app.innerHTML = renderLogin(); return; }
+
+  const unread = state.msgs.filter(m=>!m.read).length;
+  const pending = state.orders.filter(o=>o.status==='pending').length;
+  const notifs = unread + pending;
+
+  const navItems = [
+    {id:"dash",l:"Dashboard",e:"📊"},{id:"prods",l:"Products",e:"🏷️",b:state.products.length},
+    {id:"orders",l:"Orders",e:"🛒",b:pending||null},{id:"msgs",l:"Messages",e:"✉️",b:unread||null},
+    {id:"site",l:"Site & Pages",e:"🌐"},{id:"social",l:"Social Media",e:"📱"},
+    {id:"pay",l:"Payments",e:"💳"},{id:"seo",l:"SEO",e:"🔍"},{id:"deploy",l:"Deploy Guide",e:"🚀"},
+    {id:"settings",l:"Settings",e:"⚙️"},
+  ];
+  const titles = {dash:"Dashboard",prods:"Products",orders:"Orders",msgs:"Messages",site:"Site & Pages",social:"Social Media",pay:"Payments",seo:"SEO",deploy:"Deploy Guide",settings:"Settings"};
+
+  let pageHTML = '';
+  switch(state.page) {
+    case 'dash': pageHTML = renderDash(); break;
+    case 'prods': pageHTML = renderProds(); break;
+    case 'orders': pageHTML = renderOrders(); break;
+    case 'msgs': pageHTML = renderMsgs(); break;
+    case 'site': pageHTML = renderSite(); break;
+    case 'social': pageHTML = renderSocial(); break;
+    case 'pay': pageHTML = renderPay(); break;
+    case 'seo': pageHTML = renderSEO(); break;
+    case 'deploy': pageHTML = renderDeploy(); break;
+    case 'settings': pageHTML = renderSettings(); break;
+  }
+
+  app.innerHTML = `
+    <div class="overlay ${state.sidebar?'show':''}" onclick="state.sidebar=false;render()"></div>
+    <div class="app">
+      <aside class="sidebar ${state.sidebar?'open':''}">
+        <div class="sidebar-head">
+          <div class="sidebar-icon">M</div>
+          <div><div class="sidebar-brand">MEHRAS SPORTS</div><div class="sidebar-sub">Admin Panel</div></div>
+        </div>
+        <nav class="sidebar-nav">
+          ${navItems.map(n=>`<button class="nav-btn ${state.page===n.id?'active':''}" onclick="setPage('${n.id}')">
+            <span class="emoji">${n.e}</span>${n.l}${n.b?`<span class="nav-badge">${n.b}</span>`:''}
+          </button>`).join('')}
+        </nav>
+        <div class="sidebar-foot">
+          <a href="https://${state.site.domain}" target="_blank" class="visit-btn">🌐 Visit Store</a>
+          <button class="logout-btn" onclick="state.loggedIn=false;render()">🔒 Logout</button>
+        </div>
+      </aside>
+      <div class="main">
+        <div class="topbar">
+          <div class="topbar-left">
+            <button class="menu-btn" onclick="state.sidebar=true;render()">☰</button>
+            <h1>${titles[state.page]}</h1>
+          </div>
+          <div class="topbar-right">
+            <div class="notif-wrap"><button>🔔</button>${notifs>0?`<span class="notif-dot">${notifs}</span>`:''}</div>
+            <div class="avatar">MS</div>
+          </div>
+        </div>
+        <div class="content">${pageHTML}</div>
+      </div>
+    </div>
+    ${state.toast?`<div class="toast">✅ ${state.toast}</div>`:''}
+  `;
+  saveState();
+}
+
+// ── LOGIN ──
+function renderLogin() {
+  return `<div class="login-bg"><div class="login-box">
+    <div class="login-logo">M</div>
+    <div class="login-title">MEHRAS SPORTS</div>
+    <div class="login-sub">Admin Panel</div>
+    <div class="login-card">
+      <label>Password</label>
+      <div class="pw-wrap">
+        <input type="password" id="pw-input" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()">
+        <button class="pw-toggle" onclick="togglePw()">👁️</button>
+      </div>
+      <div id="pw-err" class="pw-err" style="display:none"></div>
+      <button class="login-btn" onclick="doLogin()">🔐 Login to Admin Panel</button>
+      <div class="login-footer">Protected access · mehrassports.com</div>
+    </div>
+  </div></div>`;
+}
+function doLogin() {
+  const pw = document.getElementById('pw-input').value;
+  if (pw === ADMIN_PASSWORD) { state.loggedIn = true; render(); }
+  else { const el = document.getElementById('pw-err'); el.textContent = 'Incorrect password.'; el.style.display = 'block'; }
+}
+function togglePw() {
+  const inp = document.getElementById('pw-input');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+// ── DASHBOARD ──
+function renderDash() {
+  const rev = state.orders.reduce((s,o)=>s+o.total,0);
+  const unread = state.msgs.filter(m=>!m.read).length;
+  const pending = state.orders.filter(o=>o.status==='pending').length;
+  const low = state.products.filter(p=>p.stock>0&&p.stock<20).length;
+  const oos = state.products.filter(p=>p.stock===0).length;
+  return `
+    <div class="stat-grid">
+      ${[['Revenue',`$${rev.toFixed(0)}`,'All orders','border-left:4px solid #10b981','💰'],['Products',state.products.length,`${oos} out of stock`,'border-left:4px solid #6366f1','📦'],['Pending',pending,`${state.orders.length} total`,'border-left:4px solid #f59e0b','🛒'],['Unread',unread,`${state.msgs.length} msgs`,'border-left:4px solid #ef4444','✉️']].map(([l,v,s,st,e])=>`
+        <div class="stat" style="${st}"><div class="stat-top"><span class="stat-label">${l}</span><span>${e}</span></div><div class="stat-val">${v}</div><div class="stat-sub">${s}</div></div>`).join('')}
+    </div>
+    ${(low>0||oos>0)?`<div class="tip-box" style="background:#fffbeb;border-color:#fde68a;margin-bottom:16px"><p style="color:#92400e;margin:0">⚠️ <strong>${low} low stock</strong> and <strong>${oos} out of stock</strong> products need attention.</p></div>`:''}
+    <div class="grid-2">
+      <div class="card"><div class="card-head">Recent Orders</div>
+        ${state.orders.slice(0,5).map(o=>`<div class="row-item"><div><strong style="font-size:13px">${o.cust}</strong><br><span style="font-size:11px;color:var(--gray-400)">${o.id} · ${o.date}</span></div><div style="text-align:right"><strong>$${o.total.toFixed(2)}</strong><br>${statusBadge(o.status)}</div></div>`).join('')}
+      </div>
+      <div class="card"><div class="card-head">Quick Actions</div><div class="card-body"><div class="grid-2">
+        ${[['🌐 Visit Store',`https://${state.site.domain}`],['💬 WhatsApp',`https://wa.me/${state.site.whatsapp.replace(/\\D/g,'')}`],['💰 PayPal',state.site.pay.paypalMe],['⚙️ GitHub',state.site.github]].map(([l,h])=>`<a href="${h}" target="_blank" style="display:flex;align-items:center;gap:8px;padding:10px;border:1px solid var(--gray-200);border-radius:12px;text-decoration:none;color:var(--gray-700);font-size:13px;font-weight:600">${l}</a>`).join('')}
+      </div></div></div>
+    </div>`;
+}
+
+// ── PRODUCTS ──
+function renderProds() {
+  const prods = state.products;
+  return `
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;margin-bottom:12px">
+      <div style="display:flex;gap:8px;flex:1">
+        <input class="search-input" id="prod-search" placeholder="Search products..." oninput="render()">
+        <select class="form-select" id="prod-cat-filter" style="max-width:180px" onchange="render()"><option value="">All Categories</option>${CATS.map(c=>`<option value="${c.id}">${c.n}</option>`).join('')}</select>
+      </div>
+      <button class="btn btn-red" onclick="openProdModal(null)">+ Add Product</button>
+    </div>
+    <div class="card"><div style="overflow-x:auto"><table>
+      <thead><tr><th>Product</th><th>SKU</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th></th></tr></thead>
+      <tbody>${prods.map(p=>`<tr>
+        <td><strong>${p.name}</strong>${p.badge?` <span class="prod-badge">${p.badge}</span>`:''}</td>
+        <td style="font-family:monospace;font-size:12px;color:var(--gray-500)">${p.sku}</td>
+        <td style="font-size:12px;color:var(--gray-500)">${cn(p.cat)}</td>
+        <td><strong>$${p.price.toFixed(2)}</strong>${p.orig>p.price?`<span class="price-orig">$${p.orig.toFixed(2)}</span>`:''}</td>
+        <td><span class="${stockClass(p.stock)}">${p.stock}</span></td>
+        <td>${statusBadge(p.status)}</td>
+        <td style="white-space:nowrap;text-align:right">
+          <button class="action-btn" onclick="openProdModal(${p.id})" title="Edit">✏️</button>
+          <button class="action-btn" onclick="dupeProd(${p.id})" title="Duplicate">📋</button>
+          <button class="action-btn" onclick="delProd(${p.id})" title="Delete">🗑️</button>
+        </td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+    <div style="padding:8px 12px;background:var(--gray-50);border-top:1px solid var(--gray-100);font-size:11px;color:var(--gray-400)">${prods.length} products</div>
+    </div>
+    ${state.modalOpen?renderProdModal():''}`;
+}
+function openProdModal(id) {
+  if(id) { state.editProd = {...state.products.find(p=>p.id===id)}; }
+  else { state.editProd = {id:null,name:"",sku:"",cat:"boxing-gloves",price:0,orig:0,stock:0,status:"active",badge:"",img:"",desc:"",sizes:"",colors:"",feats:"",specs:""}; }
+  state.modalOpen = true; render();
+}
+function renderProdModal() {
+  const p = state.editProd;
+  return `<div class="modal-overlay show" onclick="state.modalOpen=false;render()"><div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head"><h3>${p.id?'Edit Product':'Add New Product'}</h3><button class="modal-close" onclick="state.modalOpen=false;render()">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Product Name</label><input class="form-input" id="ep-name" value="${p.name}"></div>
+      <div class="form-row form-row-2"><div class="form-group"><label class="form-label">SKU</label><input class="form-input" id="ep-sku" value="${p.sku}"></div>
+      <div class="form-group"><label class="form-label">Category</label><select class="form-select" id="ep-cat">${CATS.map(c=>`<option value="${c.id}" ${c.id===p.cat?'selected':''}>${c.n}</option>`).join('')}</select></div></div>
+      <div class="form-row form-row-3"><div class="form-group"><label class="form-label">Sale Price ($)</label><input class="form-input" type="number" id="ep-price" value="${p.price}"></div>
+      <div class="form-group"><label class="form-label">Original Price ($)</label><input class="form-input" type="number" id="ep-orig" value="${p.orig}"></div>
+      <div class="form-group"><label class="form-label">Stock</label><input class="form-input" type="number" id="ep-stock" value="${p.stock}"></div></div>
+      <div class="form-row form-row-3"><div class="form-group"><label class="form-label">Status</label><select class="form-select" id="ep-status"><option ${p.status==='active'?'selected':''}>active</option><option ${p.status==='inactive'?'selected':''}>inactive</option></select></div>
+      <div class="form-group"><label class="form-label">Badge</label><input class="form-input" id="ep-badge" value="${p.badge}" placeholder="Best Seller..."></div>
+      <div class="form-group"><label class="form-label">Image</label><input class="form-input" id="ep-img" value="${p.img}" placeholder="photo.jpg"></div></div>
+      <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="ep-desc" rows="2">${p.desc}</textarea></div>
+      <div class="form-row form-row-2"><div class="form-group"><label class="form-label">Sizes (comma-separated)</label><input class="form-input" id="ep-sizes" value="${p.sizes}"></div>
+      <div class="form-group"><label class="form-label">Colors (comma-separated)</label><input class="form-input" id="ep-colors" value="${p.colors}"></div></div>
+      <div class="form-group"><label class="form-label">Features (one per line)</label><textarea class="form-textarea" id="ep-feats" rows="3">${p.feats}</textarea></div>
+      <div class="form-group"><label class="form-label">Specs (Key:Value | separated)</label><textarea class="form-textarea" id="ep-specs" rows="2">${p.specs}</textarea></div>
+      <div class="flex-gap mt-3">
+        <button class="btn btn-red" style="flex:1" onclick="saveProd()">${p.id?'Update Product':'Add Product'}</button>
+        <button class="btn btn-outline" onclick="state.modalOpen=false;render()">Cancel</button>
+      </div>
+    </div>
+  </div></div>`;
+}
+function saveProd() {
+  const p = {
+    id: state.editProd.id || Date.now(),
+    name: document.getElementById('ep-name').value,
+    sku: document.getElementById('ep-sku').value,
+    cat: document.getElementById('ep-cat').value,
+    price: parseFloat(document.getElementById('ep-price').value)||0,
+    orig: parseFloat(document.getElementById('ep-orig').value)||0,
+    stock: parseInt(document.getElementById('ep-stock').value)||0,
+    status: document.getElementById('ep-status').value,
+    badge: document.getElementById('ep-badge').value,
+    img: document.getElementById('ep-img').value,
+    desc: document.getElementById('ep-desc').value,
+    sizes: document.getElementById('ep-sizes').value,
+    colors: document.getElementById('ep-colors').value,
+    feats: document.getElementById('ep-feats').value,
+    specs: document.getElementById('ep-specs').value,
+  };
+  if(!p.name) return;
+  if(state.editProd.id) { state.products = state.products.map(x=>x.id===p.id?p:x); }
+  else { state.products.push(p); }
+  state.modalOpen = false; flash("Product saved!"); render();
+}
+function delProd(id) { if(confirm('Delete this product?')){ state.products = state.products.filter(p=>p.id!==id); flash("Product deleted!"); render(); }}
+function dupeProd(id) { const p = state.products.find(x=>x.id===id); state.products.push({...p,id:Date.now(),name:p.name+' (Copy)',sku:p.sku+'-C'}); flash("Product duplicated!"); render(); }
+
+// ── ORDERS ──
+function renderOrders() {
+  const all = state.orders;
+  return `
+    <div class="filter-bar">
+      ${['all','pending','confirmed','shipped','delivered','cancelled'].map(s=>`<button class="filter-btn ${state._orderFilter===s?'active':''}" onclick="state._orderFilter='${s}';render()">${s==='all'?'All':s.charAt(0).toUpperCase()+s.slice(1)} (${s==='all'?all.length:all.filter(o=>o.status===s).length})</button>`).join('')}
+    </div>
+    <div class="card"><div style="overflow-x:auto"><table>
+      <thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Pay</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>${(state._orderFilter&&state._orderFilter!=='all'?all.filter(o=>o.status===state._orderFilter):all).map(o=>`<tr>
+        <td><strong>${o.id}</strong><br><span style="font-size:11px;color:var(--gray-400)">${o.date}</span></td>
+        <td>${o.cust}<br><span style="font-size:11px;color:var(--gray-400)">${o.country}</span></td>
+        <td><strong>$${o.total.toFixed(2)}</strong></td>
+        <td>${payBadge(o.pay)}</td>
+        <td>${statusBadge(o.status)}</td>
+        <td><button class="action-btn" onclick="openOrderDetail('${o.id}')">👁️</button>
+        <select class="status-sel" onchange="updOrder('${o.id}',this.value)">${['pending','confirmed','shipped','delivered','cancelled'].map(s=>`<option ${o.status===s?'selected':''}>${s}</option>`).join('')}</select></td>
+      </tr>`).join('')}</tbody>
+    </table></div></div>
+    ${state.orderModalOpen?renderOrderModal():''}`;
+}
+function updOrder(id,s) { state.orders = state.orders.map(o=>o.id===id?{...o,status:s}:o); flash("Order updated!"); render(); }
+function openOrderDetail(id) { state.orderDetail = state.orders.find(o=>o.id===id); state.orderModalOpen = true; render(); }
+function renderOrderModal() {
+  const o = state.orderDetail; if(!o) return '';
+  return `<div class="modal-overlay show" onclick="state.orderModalOpen=false;render()"><div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head"><h3>Order ${o.id}</h3><button class="modal-close" onclick="state.orderModalOpen=false;render()">✕</button></div>
+    <div class="modal-body">
+      <div class="grid-2 mb-3">${[['Customer',o.cust],['Email',o.email],['Phone',o.ph],['Country',o.country],['Payment',o.pay],['Address',o.addr]].map(([l,v])=>`<div><div style="font-size:11px;color:var(--gray-400)">${l}</div><div style="font-weight:600;font-size:13px">${v}</div></div>`).join('')}</div>
+      <div style="border-top:1px solid var(--gray-100);padding-top:12px"><div style="font-size:11px;font-weight:700;color:var(--gray-400);text-transform:uppercase;margin-bottom:8px">Items</div>
+        ${o.items.map(it=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-50);font-size:13px"><span>${it.n} ×${it.q}</span><strong>$${(it.p*it.q).toFixed(2)}</strong></div>`).join('')}
+        <div style="display:flex;justify-content:space-between;font-size:18px;font-weight:900;margin-top:12px;color:var(--red)"><span>Total</span><span>$${o.total.toFixed(2)}</span></div>
+      </div>
+      <div class="flex-gap mt-3"><a href="https://wa.me/${o.ph?.replace(/\\D/g,'')}" target="_blank" class="btn btn-green" style="flex:1">💬 WhatsApp</a><a href="mailto:${o.email}" class="btn btn-red" style="flex:1">✉️ Email</a></div>
+    </div></div></div>`;
+}
+
+// ── MESSAGES ──
+function renderMsgs() {
+  const unread = state.msgs.filter(m=>!m.read).length;
+  const sel = state.selMsg;
+  return `<div class="msg-grid">
+    <div class="msg-list"><div class="card-head">Inbox (${unread} unread)</div>
+      <div style="flex:1;overflow-y:auto">${state.msgs.map(m=>`<button class="msg-item ${sel?.id===m.id?'active':''} ${!m.read?'unread':''}" onclick="state.selMsg=state.msgs.find(x=>x.id===${m.id});state.msgs=state.msgs.map(x=>x.id===${m.id}?{...x,read:true}:x);render()">
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:13px;${!m.read?'font-weight:700':''}">${m.name}</span>${typeBadge(m.type)}</div>
+        <div style="font-size:12px;color:var(--gray-500);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.subj}</div>
+        <div style="font-size:10px;color:var(--gray-400);margin-top:2px">${m.date}</div>
+      </button>`).join('')}</div>
+    </div>
+    <div class="msg-detail ${sel?'show':''}">
+      ${sel?`<div style="padding:16px;border-bottom:1px solid var(--gray-100)"><h3 style="font-weight:700">${sel.subj}</h3><p style="font-size:13px;color:var(--gray-500);margin-top:4px">From <strong>${sel.name}</strong> · ${sel.email} · ${sel.date}</p></div>
+        <div style="padding:16px;flex:1"><p style="color:var(--gray-700);line-height:1.7">${sel.msg}</p></div>
+        <div style="padding:12px;border-top:1px solid var(--gray-100);display:flex;gap:8px">
+          <a href="mailto:${sel.email}?subject=Re: ${sel.subj}" class="btn btn-red" style="flex:1">✉️ Reply</a>
+          <a href="https://wa.me/?text=Hi ${sel.name}" target="_blank" class="btn btn-green" style="flex:1">💬 WhatsApp</a>
+          <button class="btn btn-outline" onclick="state.msgs=state.msgs.filter(m=>m.id!==${sel.id});state.selMsg=null;flash('Deleted!');render()">🗑️</button>
+        </div>`
+      :`<div style="display:flex;align-items:center;justify-content:center;flex:1;color:var(--gray-400)">📬 Select a message</div>`}
+    </div>
+  </div>`;
+}
+
+// ── SITE & PAGES ──
+function renderSite() {
+  const s = state.site;
+  return `
+    <div class="card"><div class="card-head">Store Information</div><div class="card-body">
+      <div class="form-row form-row-2">
+        <div class="form-group"><label class="form-label">Store Name</label><input class="form-input" value="${s.name}" onchange="state.site.name=this.value"></div>
+        <div class="form-group"><label class="form-label">Tagline</label><input class="form-input" value="${s.tagline}" onchange="state.site.tagline=this.value"></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" value="${s.email}" onchange="state.site.email=this.value"></div>
+        <div class="form-group"><label class="form-label">Phone</label><input class="form-input" value="${s.phone}" onchange="state.site.phone=this.value"></div>
+        <div class="form-group"><label class="form-label">WhatsApp</label><input class="form-input" value="${s.whatsapp}" onchange="state.site.whatsapp=this.value"></div>
+        <div class="form-group"><label class="form-label">Domain</label><input class="form-input" value="${s.domain}" onchange="state.site.domain=this.value"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Address</label><input class="form-input" value="${s.address}" onchange="state.site.address=this.value"></div>
+    </div></div>
+    <div class="card"><div class="card-head">Announcement Banner</div><div class="card-body">
+      <label class="check-label mb-2"><input type="checkbox" ${s.showAnnounce?'checked':''} onchange="state.site.showAnnounce=this.checked"> Show announcement bar</label>
+      <div class="form-group"><label class="form-label">Text</label><input class="form-input" value="${s.announce}" onchange="state.site.announce=this.value"></div>
+    </div></div>
+    <div class="card"><div class="card-head">Hero Slides</div><div class="card-body">
+      ${s.slides.map((sl,i)=>`<div style="background:var(--gray-50);border-radius:12px;padding:12px;margin-bottom:12px">
+        <div class="flex-between mb-2"><span style="font-size:11px;font-weight:700;color:var(--gray-400)">SLIDE ${i+1}</span>${s.slides.length>1?`<button class="action-btn" onclick="state.site.slides.splice(${i},1);render()">🗑️</button>`:''}</div>
+        <div class="form-group"><label class="form-label">Title</label><input class="form-input" value="${sl.title}" onchange="state.site.slides[${i}].title=this.value"></div>
+        <div class="form-group"><label class="form-label">Subtitle</label><input class="form-input" value="${sl.sub}" onchange="state.site.slides[${i}].sub=this.value"></div>
+        <div class="form-row form-row-2"><div class="form-group"><label class="form-label">Button Text</label><input class="form-input" value="${sl.cta}" onchange="state.site.slides[${i}].cta=this.value"></div>
+        <div class="form-group"><label class="form-label">Link</label><input class="form-input" value="${sl.link}" onchange="state.site.slides[${i}].link=this.value"></div></div>
+      </div>`).join('')}
+      <button onclick="state.site.slides.push({title:'',sub:'',cta:'Shop Now',link:''});render()" style="font-size:13px;color:var(--red);font-weight:700;background:none;border:none;cursor:pointer">+ Add Slide</button>
+    </div></div>
+    <button class="btn btn-red btn-full" onclick="saveState();flash('Site settings saved!')">💾 Save Site Settings</button>`;
+}
+
+// ── SOCIAL ──
+function renderSocial() {
+  const platforms = [{k:"facebook",l:"Facebook",e:"📘",ph:"https://facebook.com/mehrassports"},{k:"instagram",l:"Instagram",e:"📸",ph:"https://instagram.com/mehrassports"},{k:"whatsapp",l:"WhatsApp",e:"💬",ph:"https://wa.me/923417007400"},{k:"youtube",l:"YouTube",e:"🎬",ph:"https://youtube.com/@mehrassports"},{k:"tiktok",l:"TikTok",e:"🎵",ph:"https://tiktok.com/@mehrassports"},{k:"twitter",l:"X / Twitter",e:"🐦",ph:"https://x.com/mehrassports"},{k:"linkedin",l:"LinkedIn",e:"💼",ph:"https://linkedin.com/company/mehrassports"},{k:"pinterest",l:"Pinterest",e:"📌",ph:"https://pinterest.com/mehrassports"}];
+  return `<div class="card"><div class="card-head">Social Media Accounts</div><div class="card-body">
+    <p style="font-size:13px;color:var(--gray-500);margin-bottom:12px">These URLs appear in the header, footer and all pages.</p>
+    ${platforms.map(p=>`<div class="social-row"><span class="emoji">${p.e}</span><input class="form-input" value="${state.site.social[p.k]||''}" placeholder="${p.ph}" onchange="state.site.social['${p.k}']=this.value">${state.site.social[p.k]?`<a href="${state.site.social[p.k]}" target="_blank" style="font-size:13px">🔗</a>`:''}</div>`).join('')}
+  </div></div>
+  <button class="btn btn-red btn-full" onclick="saveState();flash('Social media saved!')">💾 Save Social Media</button>`;
+}
+
+// ── PAYMENTS ──
+function renderPay() {
+  const p = state.site.pay;
+  return `
+    <div class="card"><div class="card-head">💳 PayPal</div><div class="card-body">
+      <div class="form-group"><label class="form-label">PayPal Email</label><input class="form-input" value="${p.paypalEmail}" onchange="state.site.pay.paypalEmail=this.value"></div>
+      <div class="form-group"><label class="form-label">PayPal.Me Link</label><input class="form-input" value="${p.paypalMe}" onchange="state.site.pay.paypalMe=this.value"></div>
+    </div></div>
+    <div class="card"><div class="card-head">💸 Wise</div><div class="card-body">
+      <div class="form-group"><label class="form-label">Wise Username</label><input class="form-input" value="${p.wiseUser}" onchange="state.site.pay.wiseUser=this.value"></div>
+      <div class="form-group"><label class="form-label">Wise Link</label><input class="form-input" value="${p.wiseLink}" onchange="state.site.pay.wiseLink=this.value"></div>
+    </div></div>
+    <div class="card"><div class="card-head">🏦 Bank Transfer</div><div class="card-body">
+      <div class="form-group"><label class="form-label">Bank Name</label><input class="form-input" value="${p.bankName}" onchange="state.site.pay.bankName=this.value" placeholder="e.g. Meezan Bank"></div>
+      <div class="form-group"><label class="form-label">Account Number</label><input class="form-input" value="${p.bankAcct}" onchange="state.site.pay.bankAcct=this.value"></div>
+      <div class="form-group"><label class="form-label">IBAN</label><input class="form-input" value="${p.bankIBAN}" onchange="state.site.pay.bankIBAN=this.value"></div>
+    </div></div>
+    <div class="card"><div class="card-head">🚚 Shipping</div><div class="card-body"><div class="form-row form-row-2">
+      <div class="form-group"><label class="form-label">Free Shipping Min ($)</label><input class="form-input" type="number" value="${state.site.freeShip}" onchange="state.site.freeShip=parseFloat(this.value)"></div>
+      <div class="form-group"><label class="form-label">Currency</label><input class="form-input" value="${state.site.currency}" onchange="state.site.currency=this.value"></div>
+    </div></div></div>
+    <button class="btn btn-red btn-full" onclick="saveState();flash('Payment settings saved!')">💾 Save Payment Settings</button>`;
+}
+
+// ── SEO ──
+function renderSEO() {
+  const s = state.site.seo;
+  return `
+    <div class="card"><div class="card-head">🔍 SEO & Meta Tags</div><div class="card-body">
+      <p style="font-size:13px;color:var(--gray-500);margin-bottom:12px">Appears in Google results and social sharing.</p>
+      <div class="form-group"><label class="form-label">Meta Title</label><input class="form-input" value="${s.title}" onchange="state.site.seo.title=this.value"></div>
+      <div class="form-group"><label class="form-label">Meta Description</label><textarea class="form-textarea" rows="3" onchange="state.site.seo.desc=this.value">${s.desc}</textarea></div>
+      <div class="form-group"><label class="form-label">Keywords</label><textarea class="form-textarea" rows="2" onchange="state.site.seo.keywords=this.value">${s.keywords}</textarea></div>
+    </div></div>
+    <div class="card"><div class="card-head">Preview in Google</div><div class="card-body">
+      <div style="background:var(--gray-50);border-radius:12px;padding:16px">
+        <div style="color:#1a0dab;font-size:18px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.title||'Mehras Sports'}</div>
+        <div style="color:#006621;font-size:13px;margin:4px 0">${state.site.domain}</div>
+        <div style="font-size:13px;color:var(--gray-600);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${s.desc||'No description.'}</div>
+      </div>
+    </div></div>
+    <button class="btn btn-red btn-full" onclick="saveState();flash('SEO settings saved!')">💾 Save SEO Settings</button>`;
+}
+
+// ── DEPLOY GUIDE ──
+function renderDeploy() {
+  const steps = [
+    {n:1,t:"Install Git",e:"💻",lines:["Download Git from https://git-scm.com/downloads","Install with default settings","Verify:"],cmds:["git --version"]},
+    {n:2,t:"Clone Your Repo",e:"📥",lines:["Open Terminal (Mac) or Command Prompt (Windows)","Run:"],cmds:["git clone https://github.com/naimtahirbaig/mehrassports.git","cd mehrassports"]},
+    {n:3,t:"Make Changes to Files",e:"✏️",lines:["Edit HTML files to update products, prices, descriptions","Add/remove images in the images/products/ folder","Update social links in the HTML header/footer"]},
+    {n:4,t:"Push Changes Live",e:"🚀",lines:["After editing files, run these commands:"],cmds:['git add .','git commit -m "Updated products and prices"','git push']},
+    {n:5,t:"Enable GitHub Pages (First Time Only)",e:"🌐",lines:["Go to github.com/naimtahirbaig/mehrassports → Settings","Click Pages in sidebar","Source: Deploy from branch → main → / (root) → Save","Site will be live at naimtahirbaig.github.io/mehrassports"]},
+    {n:6,t:"Connect Custom Domain",e:"🔗",lines:["In GitHub Pages settings, type: mehrassports.com → Save","Add DNS A records at your domain registrar:"],cmds:["185.199.108.153","185.199.109.153","185.199.110.153","185.199.111.153"],lines2:["Add CNAME: www → naimtahirbaig.github.io","Wait 24-48 hours, then enable Enforce HTTPS"]},
+    {n:7,t:"Update Website (Repeat Anytime)",e:"🔄",lines:["After any changes:"],cmds:['git add .','git commit -m "Update"','git push'],lines2:["Changes go live in 1-2 minutes!"]},
+  ];
+  return `
+    <div class="deploy-hero"><h2>🚀 Deployment Guide</h2><p>Step-by-step to deploy & update your Mehras Sports website.</p></div>
+    <div class="card"><div class="card-head">📋 Quick Info</div><div class="card-body"><div class="grid-3">
+      ${[['GitHub Repo',state.site.github,'⚙️'],['Live Domain','https://'+state.site.domain,'🌐'],['Hosting','GitHub Pages (Free)','💚']].map(([l,v,e])=>`<div style="background:var(--gray-50);border-radius:12px;padding:12px"><div style="font-size:11px;font-weight:700;color:var(--gray-400);text-transform:uppercase">${e} ${l}</div><div style="font-size:13px;font-weight:600;margin-top:4px;word-break:break-all">${v}</div></div>`).join('')}
+    </div></div></div>
+    ${steps.map(s=>`<div class="card step-card"><div class="step-head"><div class="step-num">${s.n}</div><h3>${s.e} ${s.t}</h3></div><div class="step-body">
+      ${(s.lines||[]).map(l=>`<p>${l}</p>`).join('')}
+      ${(s.cmds||[]).map(c=>`<div class="cmd-line"><code>${c}</code><button onclick="navigator.clipboard?.writeText('${c.replace(/'/g,"\\'")}');flash('Copied!')">📋</button></div>`).join('')}
+      ${(s.lines2||[]).map(l=>`<p>${l}</p>`).join('')}
+    </div></div>`).join('')}
+    <div class="tip-box"><h3>💡 Tips & Troubleshooting</h3>
+      <p>• <strong>GitHub Token:</strong> If password fails, create a Personal Access Token at github.com → Settings → Developer Settings → Tokens</p>
+      <p>• <strong>DNS not working?</strong> Check at dnschecker.org</p>
+      <p>• <strong>HTTPS error?</strong> Wait 24hrs after adding domain, then enable Enforce HTTPS</p>
+      <p>• <strong>404?</strong> Make sure index.html is in repo root, not a subfolder</p>
+      <p>• <strong>Not updating?</strong> Hard refresh: Ctrl+Shift+R (Cmd+Shift+R on Mac)</p>
+    </div>
+    <div class="card"><div class="card-head">🔐 Admin Panel Access</div><div class="card-body">
+      <div style="background:var(--gray-50);border-radius:12px;padding:16px">
+        <div class="flex-between"><span style="font-size:13px;color:var(--gray-500)">Password:</span><code style="background:var(--gray-200);padding:4px 12px;border-radius:8px;font-weight:700">${ADMIN_PASSWORD}</code></div>
+        <p style="font-size:12px;color:var(--gray-400);margin-top:8px">⚠️ Change this in admin.html before deploying (edit ADMIN_PASSWORD at top of script).</p>
+      </div>
+    </div></div>`;
+}
+
+// ── SETTINGS ──
+function renderSettings() {
+  return `
+    <div class="card"><div class="card-head">🚀 Deployment</div><div class="card-body">
+      <div class="form-group"><label class="form-label">GitHub Repository</label><input class="form-input" value="${state.site.github}" onchange="state.site.github=this.value"></div>
+      <div class="form-group"><label class="form-label">Custom Domain</label><input class="form-input" value="${state.site.domain}" onchange="state.site.domain=this.value"></div>
+      <div class="flex-gap mt-2"><a href="${state.site.github}" target="_blank" class="btn btn-dark">⚙️ GitHub</a><a href="https://${state.site.domain}" target="_blank" class="btn btn-red">🌐 Live Site</a></div>
+    </div></div>
+    <div class="card"><div class="card-head">📊 Website Stats</div><div class="card-body"><div class="grid-4">
+      ${[['Products',state.products.length],['Categories',CATS.length],['Orders',state.orders.length],['Images','208']].map(([l,v])=>`<div class="text-center" style="background:var(--gray-50);border-radius:12px;padding:12px"><div style="font-size:24px;font-weight:900">${v}</div><div style="font-size:11px;font-weight:700;color:var(--gray-400)">${l}</div></div>`).join('')}
+    </div></div></div>
+    <div class="card"><div class="card-head">💾 Data Management</div><div class="card-body">
+      <p style="font-size:13px;color:var(--gray-500);margin-bottom:8px">Export all data as JSON backup, or reset to defaults.</p>
+      <div class="flex-gap"><button class="btn btn-dark" onclick="exportData()">⬇️ Export All Data</button><button class="btn btn-outline" onclick="if(confirm('Reset all data to defaults?')){localStorage.removeItem('mehras_admin');location.reload();}">🔄 Reset to Defaults</button></div>
+    </div></div>
+    <div class="card"><div class="card-head">©️ Copyright</div><div class="card-body">
+      <div class="form-group"><label class="form-label">Copyright Text</label><input class="form-input" value="${state.site.copyright}" onchange="state.site.copyright=this.value"></div>
+    </div></div>`;
+}
+function exportData() {
+  const data = {site:state.site,products:state.products,orders:state.orders,messages:state.msgs,exportedAt:new Date().toISOString()};
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url = URL.createObjectURL(blob); const a = document.createElement('a');
+  a.href=url; a.download='mehras-backup-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+  URL.revokeObjectURL(url); flash("Data exported!");
+}
+
+// Initial render
+render();
+</script>
+</body>
+</html>
